@@ -111,10 +111,13 @@ Reading `access.log`, you can reconstruct:
 `error.log` carries the `WARN`/`CRITICAL` trail, including two `CRITICAL`
 entries flagging the cookie-reuse and "Authentication bypass anomaly."
 
-## 5. Assumptions & one correction to the brief
+## 5. Notes
 
+-if you cannot connect to ssh at port 2275 you can use this fix
+
+```bash
 sudo systemctl edit ssh.socket --full
-ListenStream=2275
-
+add ListenStream=2275 
 sudo systemctl daemon-reload
 sudo systemctl restart ssh.socket
+```
