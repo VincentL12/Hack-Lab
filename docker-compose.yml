@@ -1,0 +1,39 @@
+version: "3.8"
+
+# NOTE: run scripts/provision.sh once on the host VM before "docker compose up" -
+# it creates /opt/admin/logs on the host (bind-mounted below) and the
+# Blue Team SSH user on port 2275.
+
+services:
+  log-seeder:
+    image: python:3.12-slim
+    container_name: cyberrange-log-seeder
+    volumes:
+      - ./logs-seed:/seed:ro
+      - admin_logs:/opt/admin/logs
+    environment:
+      - LOG_DIR=/opt/admin/logs
+    command: ["python3", "/seed/seed_logs.py"]
+
+  admin-feedback-app:
+    build: ./app
+    container_name: cyberrange-admin-feedback-app
+    ports:
+      - "3075:3075"
+    volumes:
+      - admin_logs:/opt/admin/logs
+    environment:
+      - PORT=3075
+      - LOG_DIR=/opt/admin/logs
+    depends_on:
+      log-seeder:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  admin_logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: /opt/admin/logs
+      o: bind

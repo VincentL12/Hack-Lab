@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Corporate Admin Feedback System</title>
+<!--
+
+     _____ _____ ______ _____
+    / ____|_   _|  ____|  __ \
+   | |      | | | |__  | |__) |
+   | |      | | |  __| |  _  /
+   | |____ _| |_| |____| | \ \
+    \_____|_____|______|_|  \_\
+
+   Nothing to see here... unless you know where robots go to hide.
+   Hint: check robots.txt
+
+-->
+<style>
+  body { font-family: -apple-system, Arial, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 20px; color: #222; }
+  h1 { font-size: 1.4em; }
+  textarea { width: 100%; height: 120px; }
+  .card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-top: 20px; }
+  button { padding: 8px 16px; background: #1a5fb4; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  .status { margin-top: 10px; font-size: 0.9em; }
+  nav a { margin-right: 12px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+  <nav><a href="/">Feedback</a><a href="/login">Admin Login</a></nav>
+  <h1>Corporate Admin Feedback System</h1>
+  <p>Submit feedback about our internal admin tooling. All submissions are reviewed by an administrator.</p>
+
+  <div class="card">
+    <form id="feedbackForm">
+      <label for="message">Your feedback:</label>
+      <textarea id="message" name="message" placeholder="Type your feedback here..."></textarea>
+      <br><br>
+      <button type="submit">Submit Feedback</button>
+    </form>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('message').value;
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      const data = await res.json();
+      document.getElementById('status').textContent =
+        res.status === 200 ? 'Feedback submitted, thank you!' : ('Rejected: ' + (data.reason || data.status));
+    });
+  </script>
+</body>
+</html>
